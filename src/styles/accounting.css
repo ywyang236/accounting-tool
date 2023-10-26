@@ -1,0 +1,120 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.input-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.dropdown,
+.number-input,
+.text-input,
+.add-btn {
+    margin: 0 10px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.dropdown:focus,
+.number-input:focus,
+.text-input:focus {
+    outline-color: #0992c9;
+}
+
+.dropdown {
+    appearance: none;
+    width: 80px;
+    background-color: white;
+}
+
+.number-input {
+    width: 80px;
+}
+
+.text-input {
+    width: 200px;
+}
+
+.add-btn {
+    background-color: #0992c9;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 16px;
+}
+
+.add-btn:hover {
+    background-color: #056890;
+}
+
+.record-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.record-amount {
+    flex-basis: 80px;
+    color: green;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.record-description {
+    flex-basis: 400px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-btn {
+    padding: 5px 10px;
+    margin-left: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #959595;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.delete-btn:hover {
+    background-color: #cc0000;
+}
+
+.home-btn {
+    margin-top: 20px;
+    display: block;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px 20px;
+    background-color: #0992c9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.home-btn:hover {
+    background-color: #056890;
+}
+
+.total-section {
+    text-align: center;
+    margin-top: 20px;
+}
