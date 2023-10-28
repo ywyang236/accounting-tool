@@ -15,7 +15,7 @@ body {
 .dropdown,
 .number-input,
 .text-input,
-.add-btn {
+.add-button {
     margin: 0 10px;
     padding: 10px;
     font-size: 16px;
@@ -43,7 +43,7 @@ body {
     width: 200px;
 }
 
-.add-btn {
+.add-button {
     background-color: #0992c9;
     color: white;
     border: none;
@@ -52,7 +52,7 @@ body {
     font-size: 16px;
 }
 
-.add-btn:hover {
+.add-button:hover {
     background-color: #056890;
 }
 
@@ -79,7 +79,7 @@ body {
     align-items: center;
 }
 
-.delete-btn {
+.delete-button {
     padding: 5px 10px;
     margin-left: 10px;
     font-size: 14px;
@@ -91,11 +91,11 @@ body {
     transition: background-color 0.2s;
 }
 
-.delete-btn:hover {
+.delete-button:hover {
     background-color: #cc0000;
 }
 
-.home-btn {
+.home-button {
     margin-top: 20px;
     display: block;
     width: fit-content;
@@ -110,7 +110,7 @@ body {
     transition: background-color 0.2s;
 }
 
-.home-btn:hover {
+.home-button:hover {
     background-color: #056890;
 }
 

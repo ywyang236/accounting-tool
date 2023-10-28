@@ -1,9 +1,13 @@
-import React, { useState, ChangeEvent } from 'react';
+// accounting.tsx
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import '../styles/accounting.css';
+import { collection, doc, addDoc, deleteDoc, getDocs, QueryDocumentSnapshot } from "firebase/firestore"; // 加入 getDocs
+import db from '../app/firebase';
 
 type RecordType = '收入' | '支出';
 
 type Record = {
+    id?: string;
     type: RecordType;
     amount: number;
     description: string;
@@ -15,16 +19,53 @@ export default function Accounting() {
     const [description, setDescription] = useState<string>("");
     const [records, setRecords] = useState<Record[]>([]);
 
-    const addRecord = () => {
-        const adjustedAmount = type === "收入" ? amount : -amount;
-        setRecords([...records, { type, amount: adjustedAmount, description }]);
-        setAmount(0);
-        setDescription("");
+    useEffect(() => {
+        const fetchRecords = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, 'records'));
+                const fetchedRecords: Record[] = [];
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    fetchedRecords.push({
+                        id: doc.id,
+                        type: data.type,
+                        amount: data.amount,
+                        description: data.description,
+                    });
+                });
+                setRecords(fetchedRecords);
+            } catch (error) {
+                console.error("Error fetching records:", error);
+            }
+        };
+        fetchRecords();
+    }, []);
+
+    const addRecord = async () => {
+        try {
+            const adjustedAmount = type === "收入" ? amount : -amount;
+            const newRecord = { type, amount: adjustedAmount, description };
+
+            const recordRef = await addDoc(collection(db, 'records'), newRecord);
+            const completeRecord = { ...newRecord, id: recordRef.id };
+
+            setRecords([...records, completeRecord]);
+            setAmount(0);
+            setDescription("");
+
+        } catch (error) {
+            console.error("Error adding record:", error);
+        }
     };
 
-    const deleteRecord = (indexToDelete: number) => {
-        setRecords(records.filter((_, index) => index !== indexToDelete));
-    };
+    const deleteRecord = async (recordId: string) => {
+        try {
+            await deleteDoc(doc(db, 'records', recordId));
+            setRecords(records.filter(record => record.id !== recordId));
+        } catch (error) {
+            console.error("Error deleting record:", error);
+        };
+    }
 
     const getTotal = (): number => {
         return records.reduce((total, record) => total + record.amount, 0);
@@ -54,7 +95,7 @@ export default function Accounting() {
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
                     placeholder="說明"
                 />
-                <button className="add-btn" onClick={addRecord}>新增紀錄</button>
+                <button className="add-button" onClick={addRecord}>新增紀錄</button>
             </div>
             <div>
                 {records.map((record, index) => (
@@ -63,14 +104,14 @@ export default function Accounting() {
                             {record.amount}
                         </span>
                         <span className="record-description">{record.description}</span>
-                        <button className="delete-btn" onClick={() => deleteRecord(index)}>刪除</button>
+                        <button className="delete-button" onClick={() => deleteRecord(record.id!)}>刪除</button>
                     </div>
                 ))}
             </div>
             <div className="total-section">
                 <strong>小計：</strong>{getTotal()}
             </div>
-            <button className="home-btn" onClick={() => window.location.href = "/"}>返回首頁</button>
+            <button className="home-button" onClick={() => window.location.href = "/"}>返回首頁</button>
         </div>
     );
 }

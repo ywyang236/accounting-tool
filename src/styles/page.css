@@ -39,7 +39,7 @@ body {
     background-color: white;
 }
 
-.start-btn {
+.start-button {
     padding: 10px 20px;
     background-color: #0992c9;
     color: white;
@@ -49,6 +49,6 @@ body {
     transition: background-color 0.2s;
 }
 
-.start-btn:hover {
+.start-button:hover {
     background-color: #056890;
 }

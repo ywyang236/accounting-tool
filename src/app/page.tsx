@@ -13,7 +13,7 @@ function HomePage() {
       </div>
       <div className="footer-section">
         <Link href="/accounting">
-          <button className="start-btn">開始</button>
+          <button className="start-button">開始</button>
         </Link>
       </div>
     </div>
