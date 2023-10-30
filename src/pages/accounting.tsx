@@ -1,8 +1,12 @@
 // accounting.tsx
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import '../styles/accounting.css';
-import { collection, doc, addDoc, deleteDoc, getDocs, QueryDocumentSnapshot } from "firebase/firestore"; // 加入 getDocs
-import db from '../app/firebase';
+import { collection, doc, addDoc, deleteDoc, getDocs, QueryDocumentSnapshot } from "firebase/firestore";
+import { db } from '@/lib/firebase/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/lib/firebase/firebase';
+import { User } from 'firebase/auth';
+
 
 type RecordType = '收入' | '支出';
 
@@ -18,35 +22,64 @@ export default function Accounting() {
     const [amount, setAmount] = useState<number>(0);
     const [description, setDescription] = useState<string>("");
     const [records, setRecords] = useState<Record[]>([]);
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setCurrentUser(user);
+            } else {
+                setCurrentUser(null);
+            }
+        });
+        // Cleanup listener
+        return () => {
+            unsubscribe();
+        };
+    }, []);
 
     useEffect(() => {
         const fetchRecords = async () => {
             try {
-                const querySnapshot = await getDocs(collection(db, 'records'));
-                const fetchedRecords: Record[] = [];
-                querySnapshot.forEach(doc => {
-                    const data = doc.data();
-                    fetchedRecords.push({
-                        id: doc.id,
-                        type: data.type,
-                        amount: data.amount,
-                        description: data.description,
+                // 使用者登入時，才去取得紀錄
+                if (currentUser) {
+                    const userRef = doc(db, 'users', currentUser.uid);
+                    const recordsCollectionRef = collection(userRef, 'records');
+                    const querySnapshot = await getDocs(recordsCollectionRef);
+                    const fetchedRecords: Record[] = [];
+                    querySnapshot.forEach(doc => {
+                        const data = doc.data();
+                        fetchedRecords.push({
+                            id: doc.id,
+                            type: data.type,
+                            amount: data.amount,
+                            description: data.description,
+                        });
                     });
-                });
-                setRecords(fetchedRecords);
+                    setRecords(fetchedRecords);
+                }
             } catch (error) {
                 console.error("Error fetching records:", error);
             }
         };
         fetchRecords();
-    }, []);
+    }, [currentUser]);
 
     const addRecord = async () => {
         try {
+            if (!currentUser) {
+                console.error("No current user found");
+                return;
+            }
+
             const adjustedAmount = type === "收入" ? amount : -amount;
             const newRecord = { type, amount: adjustedAmount, description };
 
-            const recordRef = await addDoc(collection(db, 'records'), newRecord);
+            // 保存紀錄時，根據當前使用者的uid
+            const userRef = doc(db, 'users', currentUser.uid);
+            const recordsCollectionRef = collection(userRef, 'records');
+            const recordRef = await addDoc(recordsCollectionRef, newRecord);
+
             const completeRecord = { ...newRecord, id: recordRef.id };
 
             setRecords([...records, completeRecord]);
@@ -60,7 +93,12 @@ export default function Accounting() {
 
     const deleteRecord = async (recordId: string) => {
         try {
-            await deleteDoc(doc(db, 'records', recordId));
+            if (!currentUser) {
+                console.error("No current user found");
+                return;
+            }
+
+            await deleteDoc(doc(db, `users/${currentUser.uid}/records`, recordId));
             setRecords(records.filter(record => record.id !== recordId));
         } catch (error) {
             console.error("Error deleting record:", error);
@@ -70,6 +108,14 @@ export default function Accounting() {
     const getTotal = (): number => {
         return records.reduce((total, record) => total + record.amount, 0);
     };
+
+    if (!currentUser) {
+        return (
+            <div>
+                Please <a href="/signin">Sign In</a> to access the accounting page.
+            </div>
+        );
+    }
 
     return (
         <div>

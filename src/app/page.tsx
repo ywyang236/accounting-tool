@@ -1,6 +1,9 @@
-import React from 'react';
+// src/app/page.tsx
+import React, { useState } from 'react';
 import Link from 'next/link';
 import '../styles/page.css';
+import SignIn from './components/SignIn';
+import SignUp from './components/SignUp';
 
 function HomePage() {
   return (
@@ -10,10 +13,14 @@ function HomePage() {
       </div>
       <div className="main-section">
         <p>歡迎光臨我的頁面</p>
+        <SignIn />
+        <SignUp />
       </div>
       <div className="footer-section">
         <Link href="/accounting">
-          <button className="start-button">開始</button>
+          <a>
+            <button className="start-button">開始</button>
+          </a>
         </Link>
       </div>
     </div>
